@@ -1,80 +1,125 @@
-/* =====================================================================
-   IN5KNIGHTS — SHARED SITE UTILITIES
-   Loaded on every page, after games-data.js and before the page's own
-   script. Anything reused by 2+ pages lives here so there is exactly
-   one implementation of each behavior (one star-renderer, one toast
-   system, one card template, etc.) instead of copies drifting apart.
-   ===================================================================== */
+/* =========================================================
+   In5kNights - Shared Site JavaScript
+   ========================================================= */
 
-/* ---------- small helpers ---------- */
-function formatPrice(value) {
-  if (value === null || value === undefined) return "TBD";
-  return "$" + Number(value).toFixed(2);
+/* ---------------------------------------------------------
+   BASIC HELPERS
+--------------------------------------------------------- */
+
+function $(selector) {
+  return document.querySelector(selector);
 }
 
-function getQueryParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
+function $$(selector) {
+  return document.querySelectorAll(selector);
 }
 
-function getDeveloper(developerId) {
-  return DEVELOPERS[developerId] || {
-    name: "Unknown Developer",
-    bio: "",
-    founded: "",
-    teamSize: ""
-  };
-}
+
+/* ---------------------------------------------------------
+   IMAGE PATHS
+   Images are stored in the ROOT of the repository.
+--------------------------------------------------------- */
 
 function placeholderArtURL(game, width, height, variant, index) {
-  const title = (game && game.title) ? game.title : "Game";
-  const color = (game && game.color) ? game.color : "6c5ce7";
-  const label = variant === "screenshot"
-    ? "Screenshot " + index
-    : title;
-
-  return "https://placehold.co/" +
-    width + "x" + height +
-    "/14161d/" + color +
-    "?text=" + encodeURIComponent(label);
+  const title = game && game.title ? game.title : "In5kNights";
+  return `https://placehold.co/${width}x${height}?text=${encodeURIComponent(title)}`;
 }
 
-/* ---------- game artwork ---------- */
+
 function getGameArtURL(game, variant, index) {
+
   if (!game || !game.slug) {
     return placeholderArtURL(game, 400, 225, variant, index);
   }
 
   /*
-     Images are stored in the ROOT of the GitHub repository,
-     not inside an "Images" folder.
+    Example:
 
-     Example:
-     ember-wake-cover.png
-     ember-wake-1.png
-     ember-wake-2.png
+    slug = "ember-wake"
+
+    Cover:
+    ember-wake-cover.png
+
+    Screenshot:
+    ember-wake-1.png
+    ember-wake-2.png
+    ember-wake-3.png
   */
+
   const basePath = game.slug;
 
   if (variant === "screenshot") {
-    return basePath + "-" + index + ".png";
+    return `${basePath}-${index}.png`;
   }
 
-  return basePath + "-cover.png";
+  return `${basePath}-cover.png`;
 }
 
-function artErrorFallback(game, width, height, variant, index) {
-  return "this.onerror=null;this.src='" +
-    placeholderArtURL(game, width, height, variant, index) +
-    "';";
-}
 
-/* Turns a 0–5 numeric rating into full/half/empty Bootstrap-icon stars.
-   Used on store cards, the homepage grid, details page, and reviews —
-   one function, so every star anywhere on the site is generated the
-   same way instead of hand-typed per page. */
-function renderStars(rating) {
-  if (!rating) {
-    return '<span class="text-muted-custom small">Not yet rated</span>';
+/* ---------------------------------------------------------
+   ESCAPE HTML
+--------------------------------------------------------- */
+
+function escapeHTML(value) {
+  if (value === null || value === undefined) {
+    return "";
   }
 
-  let html = '<
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* ---------------------------------------------------------
+   PRICE
+--------------------------------------------------------- */
+
+function formatPrice(price) {
+
+  if (price === 0 || price === "0" || price === "Free") {
+    return "Free";
+  }
+
+  const number = Number(price);
+
+  if (Number.isNaN(number)) {
+    return escapeHTML(price);
+  }
+
+  return `₹${number.toFixed(2)}`;
+}
+
+
+/* ---------------------------------------------------------
+   GAME LOOKUP
+--------------------------------------------------------- */
+
+function findGameById(id) {
+
+  if (typeof games === "undefined" || !Array.isArray(games)) {
+    return null;
+  }
+
+  return games.find(game =>
+    String(game.id) === String(id)
+  );
+}
+
+
+function findGameBySlug(slug) {
+
+  if (typeof games === "undefined" || !Array.isArray(games)) {
+    return null;
+  }
+
+  return games.find(game =>
+    String(game.slug) === String(slug)
+  );
+}
+
+
+/
