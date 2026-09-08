@@ -2,6 +2,7 @@
    In5kNights - Shared Site JavaScript
    ========================================================= */
 
+
 /* ---------------------------------------------------------
    BASIC HELPERS
 --------------------------------------------------------- */
@@ -22,6 +23,7 @@ function $$(selector) {
 
 function placeholderArtURL(game, width, height, variant, index) {
   const title = game && game.title ? game.title : "In5kNights";
+
   return `https://placehold.co/${width}x${height}?text=${encodeURIComponent(title)}`;
 }
 
@@ -40,12 +42,14 @@ function getGameArtURL(game, variant, index) {
     Cover:
     ember-wake-cover.png
 
-    Screenshot:
+    Screenshots:
     ember-wake-1.png
     ember-wake-2.png
     ember-wake-3.png
   */
 
+  // IMPORTANT:
+  // Images are in the ROOT of the GitHub repository.
   const basePath = game.slug;
 
   if (variant === "screenshot") {
@@ -61,6 +65,7 @@ function getGameArtURL(game, variant, index) {
 --------------------------------------------------------- */
 
 function escapeHTML(value) {
+
   if (value === null || value === undefined) {
     return "";
   }
@@ -71,54 +76,6 @@ function escapeHTML(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-}
-
-
-/* ---------------------------------------------------------
-   PRICE
---------------------------------------------------------- */
-
-function formatPrice(price) {
-
-  if (price === 0 || price === "0" || price === "Free") {
-    return "Free";
-  }
-
-  const number = Number(price);
-
-  if (Number.isNaN(number)) {
-    return escapeHTML(price);
-  }
-
-  return `₹${number.toFixed(2)}`;
-}
-
-
-/* ---------------------------------------------------------
-   GAME LOOKUP
---------------------------------------------------------- */
-
-function findGameById(id) {
-
-  if (typeof games === "undefined" || !Array.isArray(games)) {
-    return null;
-  }
-
-  return games.find(game =>
-    String(game.id) === String(id)
-  );
-}
-
-
-function findGameBySlug(slug) {
-
-  if (typeof games === "undefined" || !Array.isArray(games)) {
-    return null;
-  }
-
-  return games.find(game =>
-    String(game.slug) === String(slug)
-  );
 }
 
 
