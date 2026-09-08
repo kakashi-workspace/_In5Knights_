@@ -1,0 +1,320 @@
+<!--
+  =============================================================
+  FILE: upload-game.html
+  PURPOSE: Developer-facing form for submitting a new game (or,
+  with ?edit=<id> in the URL, editing an existing one — the form
+  is pre-filled from js/games-data.js by js/upload-game.js). A
+  live preview card mirrors the store's real game-card component
+  as you type, and screenshots get real drag-and-drop thumbnails.
+  Front-end only: submitting shows a confirmation and returns to
+  the Dashboard, nothing is sent to a server.
+  =============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Sell Your Game — In5kNights</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <nav class="navbar navbar-expand-lg navbar-forge sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="Images/mainlogo.png" alt="" class="brand-logo" aria-hidden="true">
+        <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-2 mt-3 mt-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="store.html">Store</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="upload-game.html">Sell Your Game</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+        </ul>
+        <form class="d-flex me-lg-3 mb-3 mb-lg-0" role="search" id="navSearchForm">
+          <input class="form-control form-control-sm bg-dark text-light border-secondary" type="search" name="q" placeholder="Search games..." aria-label="Search">
+        </form>
+        <div class="d-flex align-items-center gap-3">
+          <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light and dark theme"><i class="bi bi-sun"></i></button>
+          <a href="cart.html" class="position-relative text-light" aria-label="View cart">
+            <i class="bi bi-cart3 fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge" style="background-color: var(--accent-ember); font-size: 0.6rem;">2</span>
+          </a>
+          <a href="login.html" class="btn btn-forge btn-sm px-3">Log In</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="container pt-5 pb-3">
+    <p class="eyebrow mb-1" id="pageEyebrow">For developers</p>
+    <h1 class="mb-2" id="pageHeading">List a New Game</h1>
+    <p class="text-muted-custom" id="pageSubheading">Fill out the details below. You'll be able to edit everything later from your Dashboard.</p>
+  </header>
+
+  <main id="mainContent" class="container pb-5">
+    <div class="row g-5">
+
+      <!-- =====================================================
+           MAIN FORM COLUMN
+           NOTE: action is not used — js/upload-game.js intercepts
+           submit and simulates saving the listing locally. In
+           production this would POST to a real backend endpoint.
+           ===================================================== -->
+      <div class="col-lg-8">
+        <form id="uploadGameForm" class="needs-validation panel p-4 p-md-5" novalidate>
+
+          <h5 class="mb-3">Basic Information</h5>
+
+          <div class="mb-3">
+            <label for="gameTitle" class="form-label">Game Title</label>
+            <input type="text" class="form-control" id="gameTitle" name="gameTitle" placeholder="e.g. Ember Wake" required>
+            <div class="invalid-feedback">Give your game a title.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="gameTagline" class="form-label d-flex justify-content-between">
+              <span>Short Tagline</span>
+              <span class="text-muted-custom small fw-normal" id="taglineCounter">0 / 90</span>
+            </label>
+            <input type="text" class="form-control" id="gameTagline" name="gameTagline" maxlength="90" placeholder="One sentence that sells the game">
+          </div>
+
+          <div class="mb-3">
+            <label for="gameDescription" class="form-label">Full Description</label>
+            <textarea class="form-control" id="gameDescription" name="gameDescription" rows="5" placeholder="Describe the game, its story, and what makes it worth playing." required></textarea>
+            <div class="invalid-feedback">A description helps players (and reviewers) understand your game.</div>
+          </div>
+
+          <!-- Tags: descriptive chips shown on the store card + details page -->
+          <div class="mb-3">
+            <label for="tagInput" class="form-label">Tags</label>
+            <div class="d-flex flex-wrap gap-2 mb-2" id="tagChipList"></div>
+            <input type="text" class="form-control form-control-sm" id="tagInput" placeholder="Type a tag and press Enter (e.g. Single-Player)">
+            <div class="form-text">Shown as badges on your game's page. Up to 6.</div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="gameGenre" class="form-label">Genre</label>
+              <select class="form-select" id="gameGenre" name="gameGenre" required>
+                <option value="" selected disabled>Choose a genre</option>
+                <option>Platformer</option>
+                <option>Roguelike</option>
+                <option>Puzzle</option>
+                <option>Metroidvania</option>
+                <option>Narrative</option>
+                <option>Co-op</option>
+                <option>Horror</option>
+                <option>Simulation</option>
+                <option>Sci-Fi</option>
+              </select>
+              <div class="invalid-feedback">Pick the genre players will find you under.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="gamePrice" class="form-label">Price (USD)</label>
+              <div class="input-group">
+                <span class="input-group-text" style="background-color: var(--bg-surface-alt); border-color: var(--border-subtle); color: var(--text-muted);">$</span>
+                <input type="number" class="form-control" id="gamePrice" name="gamePrice" step="0.01" min="0" placeholder="14.99" required>
+                <div class="invalid-feedback">Enter a price of $0 or more.</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4" style="border-color: var(--border-subtle);">
+
+          <h5 class="mb-3">Media</h5>
+
+          <div class="mb-3">
+            <label class="form-label">Cover Image</label>
+            <div class="drop-zone p-4 text-center" id="coverDropZone">
+              <i class="bi bi-image fs-3 d-block mb-2"></i>
+              <input class="form-control form-control-sm mx-auto" style="max-width: 320px;" type="file" id="coverImage" name="coverImage" accept="image/*">
+              <p class="small mb-0 mt-2">Recommended size: 1200 x 675px (16:9)</p>
+              <img id="coverPreview" class="img-fluid rounded-3 mt-3 d-none" style="max-height: 160px;" alt="Cover image preview">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Screenshots</label>
+            <div class="drop-zone p-4 text-center" id="screenshotsDropZone">
+              <i class="bi bi-images fs-3 d-block mb-2"></i>
+              <input class="form-control form-control-sm mx-auto" style="max-width: 320px;" type="file" id="screenshots" name="screenshots[]" accept="image/*" multiple>
+              <p class="small mb-0 mt-2">Drag files here or browse. These populate the carousel on your game page.</p>
+              <div class="d-flex flex-wrap gap-2 justify-content-center mt-3" id="screenshotThumbs"></div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="trailerLink" class="form-label">Trailer Link (optional)</label>
+            <input type="url" class="form-control" id="trailerLink" name="trailerLink" placeholder="https://youtube.com/watch?v=...">
+            <div class="form-text">A YouTube or Vimeo link. It will be embedded on your game's detail page.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Game Build</label>
+            <div class="drop-zone p-4 text-center">
+              <i class="bi bi-file-earmark-zip fs-3 d-block mb-2"></i>
+              <input class="form-control form-control-sm mx-auto" style="max-width: 320px;" type="file" id="gameBuild" name="gameBuild" accept=".zip,.exe">
+              <p class="small mb-0 mt-2">Upload a .zip of your build. Max file size 2GB (handled by backend storage).</p>
+            </div>
+          </div>
+
+          <hr class="my-4" style="border-color: var(--border-subtle);">
+
+          <h5 class="mb-3">System Requirements</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <p class="small text-muted-custom mb-2">Minimum</p>
+              <div class="mb-2">
+                <label for="minOS" class="form-label small">OS</label>
+                <input type="text" class="form-control form-control-sm" id="minOS" name="minOS" placeholder="Windows 10 64-bit">
+              </div>
+              <div class="mb-2">
+                <label for="minCPU" class="form-label small">Processor</label>
+                <input type="text" class="form-control form-control-sm" id="minCPU" name="minCPU" placeholder="Intel i3 / Ryzen 3">
+              </div>
+              <div class="mb-2">
+                <label for="minRAM" class="form-label small">Memory</label>
+                <input type="text" class="form-control form-control-sm" id="minRAM" name="minRAM" placeholder="4 GB RAM">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <p class="small text-muted-custom mb-2">Recommended</p>
+              <div class="mb-2">
+                <label for="recOS" class="form-label small">OS</label>
+                <input type="text" class="form-control form-control-sm" id="recOS" name="recOS" placeholder="Windows 11 64-bit">
+              </div>
+              <div class="mb-2">
+                <label for="recCPU" class="form-label small">Processor</label>
+                <input type="text" class="form-control form-control-sm" id="recCPU" name="recCPU" placeholder="Intel i5 / Ryzen 5">
+              </div>
+              <div class="mb-2">
+                <label for="recRAM" class="form-label small">Memory</label>
+                <input type="text" class="form-control form-control-sm" id="recRAM" name="recRAM" placeholder="8 GB RAM">
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4" style="border-color: var(--border-subtle);">
+
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
+            <label class="form-check-label small text-muted-custom" for="agreeTerms">
+              I confirm I own the rights to this content and agree to In5kNights's Developer Terms.
+            </label>
+            <div class="invalid-feedback">You need to agree before submitting.</div>
+          </div>
+
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-forge px-4" id="submitBtn">Submit for Review</button>
+            <button type="button" class="btn btn-outline-forge px-4" id="saveDraftBtn">Save as Draft</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- =====================================================
+           SIDEBAR: live preview card + the "what happens next"
+           checklist.
+           ===================================================== -->
+      <div class="col-lg-4">
+        <div class="panel p-4 mb-4 sticky-top" style="top: 90px;">
+          <h6 class="mb-3 text-muted-custom">Live Preview</h6>
+          <div class="row row-cols-1 g-0" id="livePreviewCard"></div>
+
+          <hr class="my-4" style="border-color: var(--border-subtle);">
+
+          <h6 class="mb-4">What happens next</h6>
+          <div class="d-flex gap-3 mb-4">
+            <span class="step-num d-flex align-items-center justify-content-center flex-shrink-0">1</span>
+            <div>
+              <p class="mb-0 fw-semibold small">Review</p>
+              <p class="mb-0 small text-muted-custom">Our team checks your listing for completeness — usually within 48 hours.</p>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-4">
+            <span class="step-num d-flex align-items-center justify-content-center flex-shrink-0">2</span>
+            <div>
+              <p class="mb-0 fw-semibold small">Published</p>
+              <p class="mb-0 small text-muted-custom">Once approved, your game goes live in the Store and becomes purchasable.</p>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mb-4">
+            <span class="step-num d-flex align-items-center justify-content-center flex-shrink-0">3</span>
+            <div>
+              <p class="mb-0 fw-semibold small">Get Paid</p>
+              <p class="mb-0 small text-muted-custom">Track sales from your Dashboard. Payouts go out monthly — you keep 85%.</p>
+            </div>
+          </div>
+          <hr style="border-color: var(--border-subtle);">
+          <p class="small text-muted-custom mb-0">Questions? Check the <a href="#" style="color: var(--accent-violet);">Developer FAQ</a> or reach out to support.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-forge pt-5 pb-4 mt-4">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="d-flex align-items-center gap-2 text-decoration-none mb-2" href="index.html">
+            <img src="Images/mainlogo.png" alt="" class="brand-logo footer-brand-logo" aria-hidden="true">
+            <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark footer-brand-wordmark">
+          </a>
+          <p class="small">The storefront built for independent developers and the players who love discovering them first.</p>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Store</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="store.html">Browse Games</a></li>
+            <li class="mb-2"><a href="store.html?sort=newest">New Releases</a></li>
+            <li class="mb-2"><a href="cart.html">Your Cart</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Developers</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="upload-game.html">Sell a Game</a></li>
+            <li class="mb-2"><a href="dashboard.html">Dashboard</a></li>
+            <li class="mb-2"><a href="login.html">Developer Login</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Company</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="#">About</a></li>
+            <li class="mb-2"><a href="#">Support</a></li>
+            <li class="mb-2"><a href="#">Terms</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Follow</h6>
+          <div class="d-flex gap-3 fs-5">
+            <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="Discord"><i class="bi bi-discord"></i></a>
+            <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4" style="border-color: var(--border-subtle);">
+      <p class="small text-center mb-0">&copy; 2026 In5kNights. All rights reserved. Built as a front-end demo.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/games-data.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/upload-game.js"></script>
+</body>
+</html>

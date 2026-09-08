@@ -1,0 +1,256 @@
+/* =====================================================================
+   IN5KNIGHTS — SHARED STYLESHEET
+   Used by every page. Page-specific overrides live in a small <style>
+   block at the top of each HTML file (keeps this file the single
+   source of truth for the design system, per-page files stay lean).
+   ===================================================================== */
+
+/* ---------- Design tokens ---------- */
+:root {
+  --bg-base: #0b0c10;
+  --bg-surface: #14161d;
+  --bg-surface-alt: #1b1e27;
+  --border-subtle: #262a35;
+  --accent-violet: #6c5ce7;
+  --accent-ember: #ff8a3d;
+  --accent-teal: #2dd4bf;
+  --accent-red: #ff6b6b;
+  --text-primary: #ededf2;
+  --text-muted: #9195a3;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Light theme override — toggled by the theme switch in the navbar.
+   Same token names, different values, so every component below just
+   works without any extra selectors. */
+[data-theme="light"] {
+  --bg-base: #f5f5f7;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #eceef2;
+  --border-subtle: #dcdfe6;
+  --text-primary: #14161d;
+  --text-muted: #5b5f6b;
+}
+
+* { scrollbar-color: var(--border-subtle) var(--bg-base); }
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, h4, h5, .brand-font { font-family: var(--font-display); }
+.mono, .price-tag { font-family: var(--font-mono); }
+.text-muted-custom { color: var(--text-muted) !important; }
+a { transition: color 0.15s ease; }
+
+/* ---------- Skip link (accessibility) ---------- */
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 2000;
+  background: var(--accent-violet); color: #fff; padding: 0.6rem 1rem; border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
+/* ---------- Navbar ---------- */
+.navbar-forge { background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); }
+.navbar-forge .nav-link { color: var(--text-muted); font-weight: 500; }
+.navbar-forge .nav-link.active, .navbar-forge .nav-link:hover { color: var(--text-primary); }
+
+/* Brand mark: gradient "spark" square + wordmark. Used instead of the
+   missing Images/mainlogo.png + Images/mainname.png files. */
+.forge-spark {
+  display: inline-block; width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-violet), var(--accent-ember));
+  box-shadow: 0 0 16px rgba(108, 92, 231, 0.45);
+  flex-shrink: 0;
+}
+.navbar-brand { color: var(--text-primary) !important; font-size: 1.15rem; }
+.brand-logo { height: 40px; width: auto; }
+.brand-wordmark { height: 24px; width: auto; }
+.footer-forge .brand-logo, .footer-brand-logo { height: 28px; }
+.footer-forge .brand-wordmark, .footer-brand-wordmark { height: 16px; }
+
+/* Theme toggle switch */
+.theme-toggle-btn {
+  background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted);
+  border-radius: 999px; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
+}
+.theme-toggle-btn:hover { color: var(--text-primary); border-color: var(--accent-violet); }
+
+/* ---------- Buttons ---------- */
+.btn-forge { background: linear-gradient(135deg, var(--accent-violet), var(--accent-ember)); color: #fff; font-weight: 600; border: none; }
+.btn-forge:hover, .btn-forge:focus { color: #fff; opacity: 0.92; }
+.btn-forge:disabled { opacity: 0.5; }
+.btn-outline-forge { border: 1px solid var(--border-subtle); color: var(--text-primary); font-weight: 500; background: transparent; }
+.btn-outline-forge:hover { border-color: var(--accent-violet); color: var(--text-primary); background-color: var(--bg-surface-alt); }
+.btn-outline-forge.active-filter { border-color: var(--accent-violet); background-color: var(--bg-surface-alt); color: var(--text-primary); }
+
+/* ---------- Shared surfaces ---------- */
+.panel { background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ember); }
+.price-tag { color: var(--accent-teal); font-weight: 600; }
+.price-tag.was-price { color: var(--text-muted); text-decoration: line-through; font-weight: 500; font-size: 0.85em; }
+
+/* ---------- Game card (store grid, homepage, related games) ---------- */
+.game-card { background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; transition: transform 0.15s ease, border-color 0.15s ease; height: 100%; position: relative; }
+.game-card:hover { transform: translateY(-4px); border-color: var(--accent-violet); }
+.game-card .card-img-top { aspect-ratio: 16 / 9; object-fit: cover; }
+.game-card .card-title { font-family: var(--font-display); font-size: 1.05rem; }
+.card-img-wrap { position: relative; overflow: hidden; }
+.cartridge-badge {
+  position: absolute; top: 10px; left: -32px; transform: rotate(-45deg);
+  background: linear-gradient(135deg, var(--accent-violet), var(--accent-ember));
+  color: #fff; font-size: 0.7rem; font-weight: 600; padding: 3px 34px; letter-spacing: 0.03em;
+}
+/* Wishlist heart overlay on card art */
+.card-wishlist-btn {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: rgba(11, 12, 16, 0.65); color: #fff; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.card-wishlist-btn.active { color: var(--accent-ember); }
+.card-wishlist-btn:hover { background: rgba(11, 12, 16, 0.85); }
+/* Quick add-to-cart overlay, revealed on hover/focus */
+.card-quick-add {
+  position: absolute; inset: auto 0 0 0; padding: 0.5rem;
+  background: linear-gradient(to top, rgba(11,12,16,0.92), transparent);
+  opacity: 0; transform: translateY(6px); transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.game-card:hover .card-quick-add, .game-card:focus-within .card-quick-add { opacity: 1; transform: translateY(0); }
+.star-rating { color: var(--accent-ember); font-size: 0.85rem; letter-spacing: 1px; }
+.empty-state { border: 1px dashed var(--border-subtle); border-radius: 12px; color: var(--text-muted); }
+
+/* ---------- Category pills ---------- */
+.category-pill {
+  background-color: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-muted);
+  border-radius: 999px; padding: 0.5rem 1.1rem; font-size: 0.9rem; white-space: nowrap;
+}
+.category-pill:hover, .category-pill.active { color: #fff; border-color: var(--accent-violet); background-color: var(--bg-surface-alt); }
+
+/* ---------- Footer ---------- */
+.footer-forge { background-color: var(--bg-surface); border-top: 1px solid var(--border-subtle); color: var(--text-muted); }
+.footer-forge a { color: var(--text-muted); text-decoration: none; }
+.footer-forge a:hover { color: var(--text-primary); }
+
+/* ---------- Forms ---------- */
+.form-control, .form-select {
+  background-color: var(--bg-surface-alt); border: 1px solid var(--border-subtle); color: var(--text-primary);
+}
+.form-control:focus, .form-select:focus {
+  background-color: var(--bg-surface-alt); color: var(--text-primary);
+  border-color: var(--accent-violet); box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+}
+.form-control::placeholder { color: var(--text-muted); opacity: 0.7; }
+.form-label { font-weight: 500; font-size: 0.92rem; }
+.form-text { color: var(--text-muted); }
+.form-range::-webkit-slider-thumb { background: var(--accent-violet); }
+.form-range::-moz-range-thumb { background: var(--accent-violet); }
+.was-validated .form-control:invalid, .form-control.is-invalid { border-color: var(--accent-red); }
+.was-validated .form-control:valid, .form-control.is-valid { border-color: var(--accent-teal); }
+.invalid-feedback { color: var(--accent-red); }
+.valid-feedback { color: var(--accent-teal); }
+
+/* Password strength meter */
+.pw-strength-track { height: 4px; border-radius: 2px; background: var(--bg-surface-alt); overflow: hidden; }
+.pw-strength-fill { height: 100%; width: 0%; transition: width 0.2s ease, background-color 0.2s ease; }
+
+/* Tag input chips (upload-game) */
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background-color: var(--bg-surface-alt); border: 1px solid var(--border-subtle);
+  color: var(--text-primary); border-radius: 999px; padding: 0.25rem 0.5rem 0.25rem 0.75rem; font-size: 0.85rem;
+}
+.tag-chip button { background: none; border: none; color: var(--text-muted); line-height: 1; padding: 0; }
+.tag-chip button:hover { color: var(--accent-red); }
+
+/* Drag/drop zone */
+.drop-zone { border: 2px dashed var(--border-subtle); border-radius: 12px; background-color: var(--bg-surface-alt); color: var(--text-muted); transition: border-color 0.15s ease, background-color 0.15s ease; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent-violet); background-color: rgba(108, 92, 231, 0.08); }
+.thumb-preview { width: 90px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-subtle); }
+.step-num { width: 28px; height: 28px; border-radius: 50%; background-color: var(--bg-surface-alt); border: 1px solid var(--border-subtle); color: var(--text-muted); font-family: var(--font-mono); font-size: 0.8rem; }
+
+/* ---------- Store: filter sidebar / toolbar / pagination ---------- */
+.filter-panel { background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; }
+.filter-panel .form-check-label { color: var(--text-muted); font-size: 0.92rem; }
+.filter-panel h6 { font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.toolbar { background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; }
+.page-link { background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-muted); }
+.page-link:hover { background-color: var(--bg-surface-alt); color: var(--text-primary); }
+.page-item.active .page-link { background-color: var(--accent-violet); border-color: var(--accent-violet); color: #fff; }
+.page-item.disabled .page-link { opacity: 0.45; }
+
+/* ---------- Cart ---------- */
+.cart-item { border-bottom: 1px solid var(--border-subtle); }
+.cart-item:last-child { border-bottom: none; }
+.cart-item img { width: 96px; height: 60px; object-fit: cover; border-radius: 8px; }
+.summary-row { display: flex; justify-content: space-between; padding: 0.4rem 0; color: var(--text-muted); }
+.summary-row.discount-row { color: var(--accent-teal); }
+.summary-row.total { color: var(--text-primary); font-weight: 700; font-size: 1.15rem; border-top: 1px solid var(--border-subtle); margin-top: 0.5rem; padding-top: 0.75rem; }
+
+/* ---------- Dashboard ---------- */
+.stat-card { background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; }
+.stat-value { font-family: var(--font-mono); font-size: 1.9rem; font-weight: 600; }
+.stat-delta { font-size: 0.8rem; }
+.stat-delta.up { color: var(--accent-teal); }
+.stat-delta.down { color: var(--accent-red); }
+.table-forge { color: var(--text-primary); border-color: var(--border-subtle); vertical-align: middle; }
+.table-forge thead { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.table-forge > :not(caption) > * > * { background-color: var(--bg-surface); border-bottom-color: var(--border-subtle); }
+.table-forge tbody tr:hover > * { background-color: var(--bg-surface-alt); }
+.table-forge th[data-sort-key] { cursor: pointer; user-select: none; }
+.table-forge th[data-sort-key]:hover { color: var(--text-primary); }
+.table-forge th[data-sort-key] .bi { opacity: 0.35; font-size: 0.75rem; }
+.table-forge th[data-sort-key].sort-active .bi { opacity: 1; color: var(--accent-violet); }
+.game-thumb { width: 64px; height: 40px; object-fit: cover; border-radius: 6px; }
+.status-pill { font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600; }
+.status-published { background-color: rgba(45, 212, 191, 0.15); color: var(--accent-teal); }
+.status-pending { background-color: rgba(255, 138, 61, 0.15); color: var(--accent-ember); }
+.status-draft { background-color: rgba(145, 149, 163, 0.15); color: var(--text-muted); }
+.status-chip { border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.82rem; }
+.status-chip.active { border-color: var(--accent-violet); background: var(--bg-surface-alt); color: var(--text-primary); }
+
+/* ---------- Game details ---------- */
+.thumb-strip img { width: 90px; height: 56px; object-fit: cover; border-radius: 6px; border: 2px solid var(--border-subtle); cursor: pointer; opacity: 0.7; }
+.thumb-strip img.active { border-color: var(--accent-violet); opacity: 1; }
+.accordion-item { background-color: var(--bg-surface); border-color: var(--border-subtle); }
+.accordion-button { background-color: var(--bg-surface); color: var(--text-primary); font-weight: 600; }
+.accordion-button:not(.collapsed) { background-color: var(--bg-surface-alt); color: var(--accent-ember); box-shadow: none; }
+.accordion-button::after { filter: invert(1); }
+[data-theme="light"] .accordion-button::after { filter: none; }
+.accordion-body { color: var(--text-muted); }
+.dev-avatar { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, var(--accent-violet), var(--accent-ember)); flex-shrink: 0; }
+.review-item { border-bottom: 1px solid var(--border-subtle); }
+.review-item:last-child { border-bottom: none; }
+
+/* ---------- Login/signup ---------- */
+.nav-tabs { border-bottom: 1px solid var(--border-subtle); }
+.nav-tabs .nav-link { color: var(--text-muted); border: none; font-weight: 600; }
+.nav-tabs .nav-link.active { color: var(--text-primary); background: transparent; border-bottom: 2px solid var(--accent-violet); }
+.account-toggle .btn-check:checked + .btn-toggle { background: linear-gradient(135deg, var(--accent-violet), var(--accent-ember)); color: #fff; border-color: transparent; }
+.btn-toggle { background-color: var(--bg-surface-alt); border: 1px solid var(--border-subtle); color: var(--text-muted); font-weight: 500; }
+.divider-line { border-color: var(--border-subtle); }
+
+/* ---------- Toasts + back-to-top (shared widgets, injected by JS) ---------- */
+.toast { background-color: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-primary); }
+.toast .btn-close { filter: invert(1); }
+[data-theme="light"] .toast .btn-close { filter: none; }
+#backToTopBtn {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1040;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border-subtle);
+  background: var(--bg-surface); color: var(--text-primary); display: none; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+#backToTopBtn.show { display: flex; }
+
+/* Reduced motion respected */
+@media (prefers-reduced-motion: reduce) {
+  .game-card, .game-card:hover, .card-quick-add, #backToTopBtn { transition: none !important; transform: none !important; }
+}
+
+/* Carousel control tint */
+.carousel-control-prev-icon, .carousel-control-next-icon { background-color: rgba(255,255,255,0.15); border-radius: 50%; padding: 18px; }

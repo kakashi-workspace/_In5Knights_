@@ -1,0 +1,205 @@
+<!--
+  =============================================================
+  FILE: game-details.html
+  PURPOSE: Single-game product page. Reads ?id= from the URL and
+  renders everything (screenshots, description, specs, reviews,
+  related games) from js/games-data.js via js/game-details.js —
+  ONE file now serves all games instead of a hard-coded page per
+  title. Visiting with no id, a bad id, or a non-published id
+  shows a friendly "not available" state instead of breaking.
+  =============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Game Details — In5kNights</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <nav class="navbar navbar-expand-lg navbar-forge sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="Images/mainlogo.png" alt="" class="brand-logo" aria-hidden="true">
+        <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-2 mt-3 mt-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="store.html">Store</a></li>
+          <li class="nav-item"><a class="nav-link" href="upload-game.html">Sell Your Game</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+        </ul>
+        <form class="d-flex me-lg-3 mb-3 mb-lg-0" role="search" id="navSearchForm">
+          <input class="form-control form-control-sm bg-dark text-light border-secondary" type="search" name="q" placeholder="Search games..." aria-label="Search">
+        </form>
+        <div class="d-flex align-items-center gap-3">
+          <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light and dark theme"><i class="bi bi-sun"></i></button>
+          <a href="cart.html" class="position-relative text-light" aria-label="View cart">
+            <i class="bi bi-cart3 fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge" style="background-color: var(--accent-ember); font-size: 0.6rem;">2</span>
+          </a>
+          <a href="login.html" class="btn btn-forge btn-sm px-3">Log In</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="mainContent" class="container py-5">
+
+    <!-- Rendered only if the id is missing/invalid/unpublished -->
+    <div id="notFoundState" class="panel p-5 text-center d-none">
+      <i class="bi bi-emoji-frown fs-1 d-block mb-3 text-muted-custom"></i>
+      <h2>This listing isn't available</h2>
+      <p class="text-muted-custom mb-4">It may have been removed, or the link is out of date.</p>
+      <a href="store.html" class="btn btn-forge">Back to the Store</a>
+    </div>
+
+    <!-- Rendered when a valid, published game is found -->
+    <div id="gameDetailContent" class="d-none">
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="store.html" class="text-muted-custom">Store</a></li>
+          <li class="breadcrumb-item"><a href="#" id="breadcrumbGenre" class="text-muted-custom">Genre</a></li>
+          <li class="breadcrumb-item active text-light" aria-current="page" id="breadcrumbTitle">Game</li>
+        </ol>
+      </nav>
+
+      <div class="row g-5">
+        <div class="col-lg-8">
+          <div id="screenshotCarousel" class="carousel slide rounded-4 overflow-hidden mb-2" data-bs-ride="false">
+            <div class="carousel-inner" id="screenshotInner"></div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#screenshotCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#screenshotCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+          <div class="d-flex gap-2 thumb-strip mb-5" id="thumbStrip"></div>
+
+          <h2 class="mb-3">About This Game</h2>
+          <p class="text-muted-custom mb-4" id="gameDescription"></p>
+          <div class="d-flex flex-wrap gap-2 mb-5" id="gameTags"></div>
+
+          <h2 class="mb-3">System Requirements</h2>
+          <div class="accordion mb-5" id="specsAccordion"></div>
+
+          <h2 class="mb-3">Player Reviews</h2>
+          <div class="panel p-4" id="reviewsPanel"></div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="panel p-4 mb-4 sticky-top" style="top: 90px;">
+            <h1 class="h3 mb-1" id="detailTitle"></h1>
+            <p class="text-muted-custom small mb-3">by <a href="#" class="text-decoration-none" id="detailDevLink" style="color: var(--accent-violet);"></a></p>
+            <img id="detailKeyArt" src="" class="img-fluid rounded-3 mb-3" alt="">
+            <div class="d-flex align-items-baseline gap-2 mb-3">
+              <span class="price-tag fs-3" id="detailPrice"></span>
+              <span class="text-muted-custom small" id="detailRatingLine"></span>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+              <button type="button" class="btn btn-forge btn-lg" id="buyNowBtn">Buy Now</button>
+              <button type="button" class="btn btn-outline-forge quick-add-btn" id="addToCartBtn" data-add-id="">
+                <i class="bi bi-cart-plus me-1"></i> Add to Cart
+              </button>
+              <button type="button" class="btn btn-outline-forge card-wishlist-btn d-flex align-items-center justify-content-center" id="wishlistBtn" data-wishlist-id="" style="position: static; width: auto; height: auto; background: transparent; color: var(--text-primary);">
+                <i class="bi bi-heart me-1"></i> <span class="wishlist-label">Add to Wishlist</span>
+              </button>
+            </div>
+            <ul class="list-unstyled small text-muted-custom mb-0">
+              <li class="mb-1"><i class="bi bi-check2 me-1" style="color: var(--accent-teal);"></i> Instant digital delivery</li>
+              <li class="mb-1"><i class="bi bi-check2 me-1" style="color: var(--accent-teal);"></i> DRM-free download</li>
+              <li><i class="bi bi-check2 me-1" style="color: var(--accent-teal);"></i> Free updates for life</li>
+            </ul>
+          </div>
+
+          <div class="panel p-4">
+            <h6 class="text-muted-custom mb-3">Developed by</h6>
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="dev-avatar" aria-hidden="true"></div>
+              <div>
+                <p class="mb-0 fw-semibold" id="detailDevName"></p>
+                <p class="mb-0 small text-muted-custom" id="detailDevMeta"></p>
+              </div>
+            </div>
+            <p class="small text-muted-custom mb-3" id="detailDevBio"></p>
+            <a href="store.html" class="btn btn-outline-forge btn-sm w-100" id="devOtherGamesLink">View Other Games</a>
+          </div>
+        </div>
+      </div>
+
+      <section class="mt-5">
+        <h2 class="mb-4">You Might Also Like</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4" id="relatedGrid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer-forge pt-5 pb-4 mt-4">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="d-flex align-items-center gap-2 text-decoration-none mb-2" href="index.html">
+            <img src="Images/mainlogo.png" alt="" class="brand-logo footer-brand-logo" aria-hidden="true">
+            <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark footer-brand-wordmark">
+          </a>
+          <p class="small">The storefront built for independent developers and the players who love discovering them first.</p>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Store</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="store.html">Browse Games</a></li>
+            <li class="mb-2"><a href="store.html?sort=newest">New Releases</a></li>
+            <li class="mb-2"><a href="cart.html">Your Cart</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Developers</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="upload-game.html">Sell a Game</a></li>
+            <li class="mb-2"><a href="dashboard.html">Dashboard</a></li>
+            <li class="mb-2"><a href="login.html">Developer Login</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Company</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="#">About</a></li>
+            <li class="mb-2"><a href="#">Support</a></li>
+            <li class="mb-2"><a href="#">Terms</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Follow</h6>
+          <div class="d-flex gap-3 fs-5">
+            <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="Discord"><i class="bi bi-discord"></i></a>
+            <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4" style="border-color: var(--border-subtle);">
+      <p class="small text-center mb-0">&copy; 2026 In5kNights. All rights reserved. Built as a front-end demo.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/games-data.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/game-details.js"></script>
+</body>
+</html>

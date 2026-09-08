@@ -1,0 +1,215 @@
+<!--
+  =============================================================
+  FILE: cart.html
+  PURPOSE: Shopping cart and checkout. Cart lines are rendered by
+  looping over CART_ITEMS (game ids) against js/games-data.js.
+  Remove buttons, the promo code box, and totals are all live —
+  see js/cart.js. No real payment processing is implemented; the
+  checkout form is validated client-side and then simulates a
+  completed purchase (see note near the form in js/cart.js).
+  =============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart — In5kNights</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <nav class="navbar navbar-expand-lg navbar-forge sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="Images/mainlogo.png" alt="" class="brand-logo" aria-hidden="true">
+        <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-2 mt-3 mt-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="store.html">Store</a></li>
+          <li class="nav-item"><a class="nav-link" href="upload-game.html">Sell Your Game</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light and dark theme"><i class="bi bi-sun"></i></button>
+          <a href="cart.html" class="position-relative text-light" aria-label="View cart">
+            <i class="bi bi-cart3 fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge" style="background-color: var(--accent-ember); font-size: 0.6rem;">2</span>
+          </a>
+          <a href="login.html" class="btn btn-forge btn-sm px-3">Log In</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="container pt-5 pb-3">
+    <p class="eyebrow mb-1" id="cartCountLabel">2 items</p>
+    <h1 class="mb-0">Your Cart</h1>
+  </header>
+
+  <main id="mainContent" class="container pb-5">
+    <div class="row g-5" id="cartLayout">
+
+      <div class="col-lg-7">
+        <div class="panel p-4">
+          <div id="cartItemsList"></div>
+        </div>
+
+        <div class="panel p-4 mt-4">
+          <label for="promoCode" class="form-label">Promo Code</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="promoCode" placeholder="Enter code (try FORGE10)">
+            <button class="btn btn-outline-forge" type="button" id="applyPromoBtn">Apply</button>
+          </div>
+          <div class="small mt-2" id="promoFeedback"></div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="panel p-4 sticky-top" style="top: 90px;">
+          <h5 class="mb-3">Order Summary</h5>
+
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span class="mono" id="summarySubtotal">$0.00</span>
+          </div>
+          <div class="summary-row discount-row d-none" id="summaryDiscountRow">
+            <span id="summaryDiscountLabel">Discount</span>
+            <span class="mono" id="summaryDiscountAmount">-$0.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Estimated Tax</span>
+            <span class="mono" id="summaryTax">$0.00</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span class="mono" id="summaryTotal">$0.00</span>
+          </div>
+
+          <hr class="my-4" style="border-color: var(--border-subtle);">
+
+          <h6 class="mb-3">Payment Details</h6>
+          <!-- NOTE: this checkout form is a front-end mock — nothing is
+               transmitted anywhere. Submitting it (after passing
+               validation) simulates a completed purchase locally. -->
+          <form id="checkoutForm" class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="cardName" class="form-label">Name on Card</label>
+              <input type="text" class="form-control" id="cardName" name="cardName" placeholder="Jordan Rivera" required>
+              <div class="invalid-feedback">Enter the name on the card.</div>
+            </div>
+            <div class="mb-3">
+              <label for="cardNumber" class="form-label">Card Number</label>
+              <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="4242 4242 4242 4242" inputmode="numeric" maxlength="19" required>
+              <div class="invalid-feedback">Enter a 13–19 digit card number.</div>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label for="cardExpiry" class="form-label">Expiry</label>
+                <input type="text" class="form-control" id="cardExpiry" name="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                <div class="invalid-feedback">Use MM/YY, not expired.</div>
+              </div>
+              <div class="col-6 mb-3">
+                <label for="cardCvc" class="form-label">CVC</label>
+                <input type="text" class="form-control" id="cardCvc" name="cardCvc" placeholder="•••" inputmode="numeric" maxlength="4" required>
+                <div class="invalid-feedback">3–4 digits.</div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label for="billingEmail" class="form-label">Email for Receipt</label>
+              <input type="email" class="form-control" id="billingEmail" name="billingEmail" placeholder="you@example.com" required>
+              <div class="invalid-feedback">Enter a valid email address.</div>
+            </div>
+
+            <button type="submit" class="btn btn-forge w-100" id="completePurchaseBtn">Complete Purchase — <span id="checkoutTotalLabel">$0.00</span></button>
+            <p class="small text-muted-custom text-center mt-3 mb-0">
+              <i class="bi bi-lock-fill me-1"></i>Secure checkout. Games unlock instantly after payment.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty cart state -->
+    <div class="empty-state text-center p-5 d-none" id="cartEmptyState">
+      <i class="bi bi-cart-x fs-1 d-block mb-3 text-muted-custom"></i>
+      <h4>Your cart is empty</h4>
+      <p class="text-muted-custom mb-3">Browse the store to find your next game.</p>
+      <a href="store.html" class="btn btn-forge">Browse the Store</a>
+    </div>
+
+    <!-- Post-purchase confirmation -->
+    <div class="panel p-5 text-center d-none" id="orderCompleteState">
+      <i class="bi bi-check-circle fs-1 d-block mb-3" style="color: var(--accent-teal);"></i>
+      <h3 class="mb-2">Purchase complete</h3>
+      <p class="text-muted-custom mb-1">Your games have unlocked instantly — check your library.</p>
+      <p class="text-muted-custom mb-4" id="orderCompleteReceiptLine"></p>
+      <a href="store.html" class="btn btn-forge">Keep Browsing</a>
+    </div>
+  </main>
+
+  <footer class="footer-forge pt-5 pb-4 mt-4">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="d-flex align-items-center gap-2 text-decoration-none mb-2" href="index.html">
+            <img src="Images/mainlogo.png" alt="" class="brand-logo footer-brand-logo" aria-hidden="true">
+            <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark footer-brand-wordmark">
+          </a>
+          <p class="small">The storefront built for independent developers and the players who love discovering them first.</p>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Store</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="store.html">Browse Games</a></li>
+            <li class="mb-2"><a href="store.html?sort=newest">New Releases</a></li>
+            <li class="mb-2"><a href="cart.html">Your Cart</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Developers</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="upload-game.html">Sell a Game</a></li>
+            <li class="mb-2"><a href="dashboard.html">Dashboard</a></li>
+            <li class="mb-2"><a href="login.html">Developer Login</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Company</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="#">About</a></li>
+            <li class="mb-2"><a href="#">Support</a></li>
+            <li class="mb-2"><a href="#">Terms</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Follow</h6>
+          <div class="d-flex gap-3 fs-5">
+            <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="Discord"><i class="bi bi-discord"></i></a>
+            <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4" style="border-color: var(--border-subtle);">
+      <p class="small text-center mb-0">&copy; 2026 In5kNights. All rights reserved. Built as a front-end demo.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/games-data.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/cart.js"></script>
+</body>
+</html>

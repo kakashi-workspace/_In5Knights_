@@ -1,0 +1,235 @@
+<!--
+  =============================================================
+  FILE: index.html
+  PURPOSE: Homepage for "In5kNights" — an indie game marketplace.
+  Hero, category pills, a featured carousel, and a "New Releases"
+  grid are all rendered from js/games-data.js by js/index.js so
+  this file never has to be hand-edited when the catalog changes.
+  =============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>In5kNights — Discover Indie Games</title>
+  <meta name="description" content="In5kNights connects independent game developers directly with players. No gatekeepers, fair revenue splits.">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* Page-specific: hero + carousel (only used here) */
+    .hero-forge {
+      background:
+        radial-gradient(circle at 15% 20%, rgba(108, 92, 231, 0.25), transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(255, 138, 61, 0.18), transparent 40%),
+        var(--bg-base);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <!-- =========================================================
+       NAVBAR: sticky top navigation shared across every page.
+       ========================================================= -->
+  <nav class="navbar navbar-expand-lg navbar-forge sticky-top py-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="Images/mainlogo.png" alt="" class="brand-logo" aria-hidden="true">
+        <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-2 mt-3 mt-lg-0">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="store.html">Store</a></li>
+          <li class="nav-item"><a class="nav-link" href="upload-game.html">Sell Your Game</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+        </ul>
+        <form class="d-flex me-lg-3 mb-3 mb-lg-0" role="search" id="navSearchForm">
+          <input class="form-control form-control-sm bg-dark text-light border-secondary" type="search" name="q" placeholder="Search games..." aria-label="Search">
+        </form>
+        <div class="d-flex align-items-center gap-3">
+          <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light and dark theme"><i class="bi bi-sun"></i></button>
+          <a href="cart.html" class="position-relative text-light" aria-label="View cart">
+            <i class="bi bi-cart3 fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge" style="background-color: var(--accent-ember); font-size: 0.6rem;">2</span>
+          </a>
+          <a href="login.html" class="btn btn-forge btn-sm px-3">Log In</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="mainContent">
+    <!-- =========================================================
+         HERO SECTION
+         ========================================================= -->
+    <header class="hero-forge py-5">
+      <div class="container py-5">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <p class="eyebrow mb-3">A marketplace built for indies</p>
+            <h1 class="display-4 fw-bold mb-3">Play what indie devs are forging next.</h1>
+            <p class="fs-5 text-muted-custom mb-4">
+              In5kNights connects independent game developers directly with players.
+              No gatekeepers, fair revenue splits, and a storefront that actually
+              celebrates small teams.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+              <a href="store.html" class="btn btn-forge btn-lg px-4">Browse the Store</a>
+              <a href="upload-game.html" class="btn btn-outline-forge btn-lg px-4">Sell Your Game</a>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <img src="Images/featured-game-art.png"
+              class="img-fluid rounded-4 border" style="border-color: var(--border-subtle) !important;"
+              alt="Featured indie game artwork">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================
+         CATEGORY PILLS — generated by looping over the unique
+         genres present in GAMES, so a new genre in the data file
+         appears here automatically. Links straight into a
+         pre-filtered store.html.
+         ========================================================= -->
+    <section class="container py-4">
+      <div class="d-flex gap-2 overflow-auto pb-2" id="categoryPills"></div>
+    </section>
+
+    <!-- =========================================================
+         FEATURED CAROUSEL — the 3 highest-rated published games,
+         rendered from GAMES (loop) rather than hard-coded slides.
+         ========================================================= -->
+    <section class="container py-4">
+      <p class="eyebrow mb-1">Editor's picks</p>
+      <h2 class="mb-4">Featured This Week</h2>
+      <div id="featuredCarousel" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel">
+        <div class="carousel-indicators" id="featuredIndicators"></div>
+        <div class="carousel-inner" id="featuredInner"></div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         NEW RELEASES GRID — loop-rendered from GAMES, sorted by
+         release date. Adding a game with a newer date bumps the
+         oldest one off this section automatically.
+         ========================================================= -->
+    <section class="container py-5">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <p class="eyebrow mb-1">Fresh off the forge</p>
+          <h2 class="mb-0">New Releases</h2>
+        </div>
+        <a href="store.html?sort=newest" class="btn btn-outline-forge btn-sm">View All</a>
+      </div>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4" id="newReleasesGrid"></div>
+    </section>
+
+    <!-- =========================================================
+         NEWSLETTER SIGNUP (feature) — client-validated email
+         capture, no backend, confirms with a toast.
+         ========================================================= -->
+    <section class="container pb-5">
+      <div class="panel p-4 p-md-5 d-flex flex-wrap justify-content-between align-items-center gap-4">
+        <div>
+          <h2 class="h4 mb-1">Get new releases in your inbox</h2>
+          <p class="text-muted-custom mb-0">One email a week. No spam, unsubscribe anytime.</p>
+        </div>
+        <form id="newsletterForm" class="needs-validation d-flex gap-2 flex-wrap" novalidate style="max-width: 380px;">
+          <input type="email" class="form-control" id="newsletterEmail" placeholder="you@example.com" required style="min-width: 220px;">
+          <div class="invalid-feedback">Enter a valid email address.</div>
+          <button type="submit" class="btn btn-forge">Subscribe</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         DEVELOPER CTA BANNER
+         ========================================================= -->
+    <section class="container pb-5">
+      <div class="p-5 rounded-4 text-center"
+        style="background: linear-gradient(135deg, rgba(108,92,231,0.15), rgba(255,138,61,0.12)); border: 1px solid var(--border-subtle);">
+        <h2 class="mb-2">Building something great?</h2>
+        <p class="text-muted-custom mb-4">Join indie developers already selling on In5kNights — keep 85% of every sale.</p>
+        <a href="upload-game.html" class="btn btn-forge btn-lg px-4">Upload Your First Game</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================
+       FOOTER (shared structure)
+       ========================================================= -->
+  <footer class="footer-forge pt-5 pb-4 mt-4">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="d-flex align-items-center gap-2 text-decoration-none mb-2" href="index.html">
+            <img src="Images/mainlogo.png" alt="" class="brand-logo footer-brand-logo" aria-hidden="true">
+            <img src="Images/mainname.png" alt="In5kNights" class="brand-wordmark footer-brand-wordmark">
+          </a>
+          <p class="small">The storefront built for independent developers and the players who love discovering them first.</p>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Store</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="store.html">Browse Games</a></li>
+            <li class="mb-2"><a href="store.html?sort=newest">New Releases</a></li>
+            <li class="mb-2"><a href="cart.html">Your Cart</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Developers</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="upload-game.html">Sell a Game</a></li>
+            <li class="mb-2"><a href="dashboard.html">Dashboard</a></li>
+            <li class="mb-2"><a href="login.html">Developer Login</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Company</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><a href="#">About</a></li>
+            <li class="mb-2"><a href="#">Support</a></li>
+            <li class="mb-2"><a href="#">Terms</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="text-light mb-3">Follow</h6>
+          <div class="d-flex gap-3 fs-5">
+            <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="Discord"><i class="bi bi-discord"></i></a>
+            <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4" style="border-color: var(--border-subtle);">
+      <p class="small text-center mb-0">&copy; 2026 In5kNights. All rights reserved. Built as a front-end demo.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/games-data.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>
